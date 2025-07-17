@@ -1,5 +1,10 @@
-import type { Metadata } from "next";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
+import { extractRouterConfig } from "uploadthing/server";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import type { Metadata } from "next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,11 +28,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Toaster closeButton expand position="top-center" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );
