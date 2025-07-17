@@ -147,13 +147,23 @@ export async function sendSimpleEmail({ to, subject, html, text, from = env.RESE
             throw new Error('Either html or text content must be provided');
         }
 
-        const result = await resend.emails.send({
-            from,
-            to,
-            subject,
-            html: html || undefined,
-            text: text || (html ? generatePlainTextFromHtml(html) : undefined),
-        });
+        let result;
+        if (html) {
+            result = await resend.emails.send({
+                from,
+                to,
+                subject,
+                html,
+                text: text || generatePlainTextFromHtml(html),
+            });
+        } else {
+            result = await resend.emails.send({
+                from,
+                to,
+                subject,
+                text: text!,
+            });
+        }
 
         if (result.error) {
             console.error('Resend API error:', result.error);
